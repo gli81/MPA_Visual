@@ -10,9 +10,6 @@ Instructions on how to install the project, including any necessary dependencies
 ## Usage
 Instructions on how to use the project, including any command-line arguments or inputs required.
 
-## Contributing
-Information on how to contribute to the project, including guidelines for submitting bug reports, feature requests, or pull requests.
-
 ## Credits
 A list of contributors to the project, including their roles and contributions.
 
