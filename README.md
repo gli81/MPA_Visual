@@ -11,11 +11,11 @@ https://user-images.githubusercontent.com/89367409/235847889-ef817af5-d25a-4dbd-
 
 ## Description of the Rshiny app
 
-The code generates a stacked bar plot with error bars using the ggplot2 package in R. The data used for the plot has variables: "year", "mean_measure_norm", "indicator", "lower_ci", "upper_ci", and "parent_area".
+* The code generates a stacked bar plot with error bars using the ggplot2 package in R. The data used for the plot has variables: "year", "mean_measure_norm", "indicator", "lower_ci", "upper_ci", and "parent_area".
 
-The x-axis of the plot represents the years, the y-axis represents the normalized mean measure, and the fill color represents the different indicators. The bars in the plot are stacked on top of each other and represent the mean measure values for each year for each indicator.
++ The x-axis of the plot represents the years, the y-axis represents the normalized mean measure, and the fill color represents the different indicators. The bars in the plot are stacked on top of each other and represent the mean measure values for each year for each indicator.
 
-Additionally, the plot includes error bars that represent the lower and upper confidence intervals of the mean measure values. The width of the error bars is set to 0.2 and they are positioned in the middle of the stacked bars.
+- Additionally, the plot includes error bars that represent the lower and upper confidence intervals of the mean measure values. The width of the error bars is set to 0.2 and they are positioned in the middle of the stacked bars.
 
 The colors for the fill of the bars are manually specified using the scale_fill_manual function, with "#619CFF", "#FF8C61", "#61FFB4", and "#999999".
 
