@@ -68,13 +68,16 @@ optdata4$lowci_norm <- ((optdata4$lowci)/100)
 optdata4$upci_norm <- ((optdata4$upci)/100)
 
 
-#---- Shiny app ----
+#---- Importing libraries for R Shiny app ----
 library(shiny)
 library(dplyr)
 library(ggplot2)
 
 
-#---? add function description ----
+#---It sets up the user interface (UI) of a Shiny application, allowing users to select parent areas, 
+#---indicators, file type, and download the selected data. It also provides placeholders for a 
+#--- histogram plot and a table to display the data. ----
+
 ui <- fluidPage(
   titlePanel("Measures between 2015 and 2021"),  # Page title
   sidebarLayout(
@@ -120,7 +123,10 @@ ui <- fluidPage(
   )
 )
 
-#---? add function description ----
+
+#---In summary, the plot_epicurve function takes data, parent areas, and indicators as input, 
+#--- and generates an epicurve plot using the ggplot2 package ----
+
 plot_epicurve <- function(data, parentarea = NULL, indicators = NULL) {
   
   # Check if parentarea or indicators are NULL
@@ -131,7 +137,7 @@ plot_epicurve <- function(data, parentarea = NULL, indicators = NULL) {
   
   # Filter data based on selected parentarea and indicators, and calculate 
   #summary statistics (confidence intervals)
-  sub_data <- data %>%
+  data <- data %>%
     filter(parent_area %in% parentarea) %>%
     filter(indicator %in% indicators) %>%
     group_by(year, parent_area, indicator) %>% # group by indicator as well
@@ -144,7 +150,7 @@ plot_epicurve <- function(data, parentarea = NULL, indicators = NULL) {
            upper_ci = mean_measure_norm + 1.96 * se)
   
   # Create bar plot with error bars and facet_wrap by parent_area
-  p <- ggplot(sub_data, aes(x = year, y = mean_measure_norm, fill = indicator)) +
+  p <- ggplot(data, aes(x = year, y = mean_measure_norm, fill = indicator)) +
     geom_bar(stat = "identity", position = "stack") +
     geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci), width = 0.2, position = position_stack(0.5)) +
     scale_fill_manual(values = c("#619CFF", "#FF8C61", "#61FFB4", "#999999")) +
@@ -159,15 +165,19 @@ plot_epicurve <- function(data, parentarea = NULL, indicators = NULL) {
   
 }
 
-#---? add function description ----
+#---In summary, the server function defines the reactive behavior of the Shiny app. 
+#--- It filters the data based on user inputs, renders the epicurve plot and table using the filtered 
+#--- data, and provides a download handler for downloading the filtered data. The functionality is 
+#--- tied to the user interface (UI) elements defined in the code you provided. ----
+
 server <- function(input, output, session) {
   
   # Define reactive data that filters optdata4 based on user input
   dat <- reactive({
-    sub_data <- optdata4
+    data <- optdata4
     
     if (!is.null(input$select_parentarea) && !is.null(input$select_indicators)){
-      sub_data <- data %>%
+      data <- data %>%
         filter(parent_area %in% input$select_parentarea) %>%
         filter(indicator %in% input$select_indicators)
     } 
@@ -196,7 +206,10 @@ server <- function(input, output, session) {
       write.table(dat(), file=file, sep=",", row.names = F)})
 }
 
-#---? add function description ----
+#---It calls the shinyApp function, passing the UI (user interface) and server functions as arguments, 
+#--- and starts the Shiny app.
+#--- The shinyApp function is the main function in the Shiny package that combines the UI and server 
+#--- components to create a complete Shiny application. ----
 shinyApp(ui = ui, server = server)                                                                                                                                            
                                                                                                          
 
