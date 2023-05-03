@@ -4,6 +4,11 @@
 ## Project Description
 A short description of the project, including its goals, features, and any relevant background information.
 
+## Rshiny App Demo
+
+https://user-images.githubusercontent.com/89367409/235847889-ef817af5-d25a-4dbd-9624-ed0b74e3df6b.mp4
+
+
 ## Description of the Rshiny app
 
 The code generates a stacked bar plot with error bars using the ggplot2 package in R. The data used for the plot has variables: "year", "mean_measure_norm", "indicator", "lower_ci", "upper_ci", and "parent_area".
