@@ -51,7 +51,7 @@ The Rshiny app allows users to select certain parent areas and indicators for wh
 
 * If the user wants to change their selection, they can go back to the sidebar panel and update their choices. The plot and table will automatically update based on the new selection.
 
-## Steps of deploying R-shiny app to shinyapps.io link [https://shiny.rstudio.com/articles/shinyapps.html]
+## Steps of deploying R-shiny app to shinyapps.io 
 
 * Install the 'rsconnect' package in R. You can do this by running the following command in R console:
              *install.packages('rsconnect')
