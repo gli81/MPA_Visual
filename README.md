@@ -80,9 +80,13 @@ The Rshiny app allows users to select certain parent areas and indicators for wh
 See below resources that offer tutorials, courses, examples, documentation, cheat sheets, and more to help one get started with R Shiny, improve your skills, and stay up-to-date with the latest developments.
 
    *The official R Shiny website: https://shiny.rstudio.com/
+   
    *RStudio Education: https://education.rstudio.com/learn/
+   
    *DataCamp: https://www.datacamp.com/courses/building-web-applications-in-r-with-shiny
+   
    *Udemy: https://www.udemy.com/topic/r-shiny/
+   
    *Coursera: https://www.coursera.org/courses?query=r%20shiny
 
 
