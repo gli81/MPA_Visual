@@ -51,6 +51,23 @@ The Rshiny app allows users to select certain parent areas and indicators for wh
 
 * If the user wants to change their selection, they can go back to the sidebar panel and update their choices. The plot and table will automatically update based on the new selection.
 
+## Steps of deploying R-shiny app to shinyapps.io link [https://shiny.rstudio.com/articles/shinyapps.html]
+
+* Install the 'rsconnect' package in R. You can do this by running the following command in R console:
+             *install.packages('rsconnect')
+* Create an account on shinyapps.io by going to their website: https://www.shinyapps.io/
+* Once logged in, you will see a dashboard. Click on the "New Application" button.
+* You will be prompted to enter some information about your app, including its name, description, and the R package dependencies. Fill in these   details accordingly.
+* Next, navigate to your R project directory and open the 'app.R' file in RStudio.
+* At the top of the 'app.R' file, add the following lines of code to connect your app to your shinyapps.io account:
+             *library(rsconnect)
+             *rsconnect::setAccountInfo(name='<YOUR_ACCOUNT_NAME>', token='<YOUR_ACCOUNT_TOKEN>')
+             *Replace '<YOUR_ACCOUNT_NAME>' and '<YOUR_ACCOUNT_TOKEN>' with the appropriate values from your shinyapps.io account.
+* Save the 'app.R' file and then click the "Publish" button in the RStudio toolbar. This will launch the publishing wizard.
+* In the publishing wizard, select the app and click the "Publish Application" button.
+* The app will now be deployed to shinyapps.io. You can access it by going to https://<YOUR_ACCOUNT_NAME>.shinyapps.io/<YOUR_APP_NAME> where '<YOUR_ACCOUNT_NAME>' is the name of your shinyapps.io account and '<YOUR_APP_NAME>' is the name you gave to your app.
+* Also see deploying instructions; *link https://shiny.rstudio.com/articles/shinyapps.html
+
 ## Credits
 * Duke marine conservation
 * Dr. David Gill - Assistant Professor, Duke University
