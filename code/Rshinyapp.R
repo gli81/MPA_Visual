@@ -137,7 +137,7 @@ plot_epicurve <- function(data, parentarea = NULL, indicators = NULL) {
   
   # Filter data based on selected parentarea and indicators, and calculate 
   #summary statistics (confidence intervals)
-  data <- data %>%
+  sub_data <- data %>%
     filter(parent_area %in% parentarea) %>%
     filter(indicator %in% indicators) %>%
     group_by(year, parent_area, indicator) %>% # group by indicator as well
@@ -150,7 +150,7 @@ plot_epicurve <- function(data, parentarea = NULL, indicators = NULL) {
            upper_ci = mean_measure_norm + 1.96 * se)
   
   # Create bar plot with error bars and facet_wrap by parent_area
-  p <- ggplot(data, aes(x = year, y = mean_measure_norm, fill = indicator)) +
+  p <- ggplot(sub_data, aes(x = year, y = mean_measure_norm, fill = indicator)) +
     geom_bar(stat = "identity", position = "stack") +
     geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci), width = 0.2, position = position_stack(0.5)) +
     scale_fill_manual(values = c("#619CFF", "#FF8C61", "#61FFB4", "#999999")) +
@@ -173,7 +173,7 @@ plot_epicurve <- function(data, parentarea = NULL, indicators = NULL) {
 server <- function(input, output, session) {
   
   # Define reactive data that filters optdata4 based on user input
-  dat <- reactive({
+  sub_data2 <- reactive({
     data <- optdata4
     
     if (!is.null(input$select_parentarea) && !is.null(input$select_indicators)){
@@ -185,14 +185,14 @@ server <- function(input, output, session) {
   
   # Render the epicurve plot using the filtered data
   output$measures_histogram <- renderPlot(
-    plot_epicurve(dat(), input$select_parentarea, input$select_indicators))
+    plot_epicurve(sub_data2(), input$select_parentarea, input$select_indicators))
   
   # Render a table showing the filtered data
   output$table_data <- renderTable({
     if (is.null(input$select_parentarea) && is.null(input$select_indicators)) {
       return(NULL)
     } else {
-      dat()
+      sub_data2()
     }
   })
   
@@ -200,10 +200,10 @@ server <- function(input, output, session) {
   output$dwd_data <- downloadHandler(
     # Set the filename for the downloaded file
     filename = function(){
-      paste("dat", input$select_parentarea, input$select_indicators, input$dtype, sep = ".")},
+      paste("sub_data2", input$select_parentarea, input$select_indicators, input$dtype, sep = ".")},
     # Write the filtered data to a file
     content = function(file){
-      write.table(dat(), file=file, sep=",", row.names = F)})
+      write.table(sub_data2(), file=file, sep=",", row.names = F)})
 }
 
 #---It calls the shinyApp function, passing the UI (user interface) and server functions as arguments, 
