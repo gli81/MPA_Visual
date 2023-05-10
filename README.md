@@ -71,7 +71,12 @@ The Rshiny app allows users to select certain parent areas and indicators for wh
    
 * Save the 'app.R' file and then click the "Publish" button in the RStudio toolbar. This will launch the publishing wizard.
 * In the publishing wizard, select the app and click the "Publish Application" button.
-* The app will now be deployed to shinyapps.io. You can access it by going to https://<YOUR_ACCOUNT_NAME>.shinyapps.io/<YOUR_APP_NAME> where '<YOUR_ACCOUNT_NAME>' is the name of your shinyapps.io account and '<YOUR_APP_NAME>' is the name you gave to your app.
+* The app will now be deployed to shinyapps.io. You can access it by going to ; 
+
+        * https://<YOUR_ACCOUNT_NAME>.shinyapps.io/<YOUR_APP_NAME> 
+             i) where '<YOUR_ACCOUNT_NAME>' is the name of your shinyapps.io account 
+            ii) '<YOUR_APP_NAME>' is the name you gave to your app.
+            
 * Also see deploying instructions; *link https://shiny.rstudio.com/articles/shinyapps.html
 
 ## Credits
