@@ -63,6 +63,11 @@ The Rshiny app allows users to select certain parent areas and indicators for wh
 * Next, navigate to your R project directory and open the 'app.R' file in RStudio.
 * At the top of the 'app.R' file, add the following lines of code to connect your app to your shinyapps.io account:
 
+      * library(rsconnect)
+           
+      * rsconnect::setAccountInfo(name='<YOUR_ACCOUNT_NAME>', token='<YOUR_ACCOUNT_TOKEN>')
+ 
+      * Replace '<YOUR_ACCOUNT_NAME>' and '<YOUR_ACCOUNT_TOKEN>' with the appropriate values from your shinyapps.io account.                              [image](https://github.com/GodwinAN/Rshiny_project/assets/89367409/d4607289-01a3-4e25-a956-c17c3739d94a).   
    
 * Save the 'app.R' file and then click the "Publish" button in the RStudio toolbar. This will launch the publishing wizard.
 * In the publishing wizard, select the app and click the "Publish Application" button.
