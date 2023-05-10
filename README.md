@@ -74,7 +74,7 @@ The Rshiny app allows users to select certain parent areas and indicators for wh
 * The app will now be deployed to shinyapps.io. You can access it by going to ; 
 
         * https://<YOUR_ACCOUNT_NAME>.shinyapps.io/<YOUR_APP_NAME> 
-             i) where '<YOUR_ACCOUNT_NAME>' is the name of your shinyapps.io account 
+             i) '<YOUR_ACCOUNT_NAME>' is the name of your shinyapps.io account 
             ii) '<YOUR_APP_NAME>' is the name you gave to your app.
             
 * Also see deploying instructions; *link https://shiny.rstudio.com/articles/shinyapps.html
