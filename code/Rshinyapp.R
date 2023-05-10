@@ -138,8 +138,6 @@ plot_epicurve <- function(data, parentarea = NULL, indicators = NULL) {
   # Filter data based on selected parentarea and indicators, and calculate 
   #summary statistics (confidence intervals)
   sub_data <- data %>%
-    filter(parent_area %in% parentarea) %>%
-    filter(indicator %in% indicators) %>%
     group_by(year, parent_area, indicator) %>% # group by indicator as well
     summarize(mean_measure_norm = mean(measure_norm),
               sd_measure_norm = sd(measure_norm),
@@ -174,10 +172,10 @@ server <- function(input, output, session) {
   
   # Define reactive data that filters optdata4 based on user input
   sub_data2 <- reactive({
-    data <- optdata4
+    sub_data3 <- optdata4
     
     if (!is.null(input$select_parentarea) && !is.null(input$select_indicators)){
-      data <- data %>%
+      sub_data3 <- sub_data3 %>%
         filter(parent_area %in% input$select_parentarea) %>%
         filter(indicator %in% input$select_indicators)
     } 
