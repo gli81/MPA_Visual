@@ -172,10 +172,9 @@ server <- function(input, output, session) {
   
   # Define reactive data that filters optdata4 based on user input
   sub_data2 <- reactive({
-    sub_data3 <- optdata4
     
     if (!is.null(input$select_parentarea) && !is.null(input$select_indicators)){
-      sub_data3 <- sub_data3 %>%
+      sub_data3 <- optdata4 %>%
         filter(parent_area %in% input$select_parentarea) %>%
         filter(indicator %in% input$select_indicators)
     } 
