@@ -149,8 +149,8 @@ plot_epicurve <- function(data, parentarea = NULL, indicators = NULL) {
   
   # Create bar plot with error bars and facet_wrap by parent_area
   p <- ggplot(sub_data, aes(x = year, y = mean_measure_norm, fill = indicator)) +
-    geom_bar(stat = "identity", position = "stack") +
-    geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci), width = 0.2, position = position_stack(0.5)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
     scale_fill_manual(values = c("#619CFF", "#FF8C61", "#61FFB4", "#999999")) +
     labs(title = "Measures between 2015 and 2021",
          x = "Year",
