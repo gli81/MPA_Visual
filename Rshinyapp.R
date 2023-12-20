@@ -143,15 +143,39 @@ plot_epicurve <- function(data, parentarea = NULL, indicators = NULL) {
               sd_measure_norm = sd(measure_norm),
               n = n(),
               se = sd_measure_norm / sqrt(n)) %>%
+    ungroup()# %>%
+    #mutate(lower_ci = mean_measure_norm - 1.96 * se,
+           #upper_ci = mean_measure_norm + 1.96 * se)
+  #print(sub_data)
+  all_comb <- expand.grid(
+    year = unique(sub_data$year),
+    parent_area = unique(sub_data$parent_area),
+    indicator = unique(sub_data$indicator)
+  )
+  all_comb <- tibble(all_comb %>%
+    mutate(mean_measure_norm = 0,
+           sd_measure_norm = 0,
+           n = 0,
+           se = 0))
+  merged_data <- full_join(sub_data, all_comb)
+  merged_data <- merged_data %>%
+    group_by(year, parent_area, indicator) %>%
+    summarize(mean_measure_norm = max(mean_measure_norm, na.rm = T),
+              sd_measure_norm = max(sd_measure_norm, na.rm = T),
+              n = max(n, na.rm = T),
+              se = max(se, na.rm = T)) %>%
     ungroup() %>%
     mutate(lower_ci = mean_measure_norm - 1.96 * se,
            upper_ci = mean_measure_norm + 1.96 * se)
+    
+  #print(merged_data)
+  
   
   # Create bar plot with error bars and facet_wrap by parent_area
-  p <- ggplot(sub_data, aes(x = year, y = mean_measure_norm, fill = indicator)) +
+  p <- ggplot(merged_data, aes(x = year, y = mean_measure_norm, fill = indicator)) +
     geom_bar(stat = "identity", position = "dodge") +
-    geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
-    scale_fill_manual(values = c("#619CFF", "#FF8C61", "#61FFB4", "#999999")) +
+    #geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
+    scale_fill_manual(values = c("#a2dab3", "#52b3c6", "#337dbb", "#253596")) +
     labs(title = "Measures between 2015 and 2021",
          x = "Year",
          y = "Measure",
