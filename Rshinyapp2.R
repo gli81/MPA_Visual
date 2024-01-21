@@ -68,7 +68,7 @@ plot_epicurve <- function(data, MPA = NULL, index = NULL) {
   # Filter data based on selected parentarea and indicators, and calculate 
   #summary statistics (confidence intervals)
   sub_data <- data %>%
-    group_by(MPAName, TimePoint) %>% # group by indicator as well
+    group_by(MPAName, TimePoint``) %>% # group by indicator as well
     summarize(mean_measure_norm = mean(measure_norm),
               sd_measure_norm = sd(measure_norm),
               n = n(),
