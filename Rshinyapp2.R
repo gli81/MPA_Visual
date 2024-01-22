@@ -1,6 +1,7 @@
 
 #Reading important libraries
 library(tidyverse)
+library(rlang)
 
 
 #Load dataset from an RDS file named "optdata.rds"
@@ -67,51 +68,53 @@ plot_epicurve <- function(data, MPA = NULL, index = NULL) {
   
   # Filter data based on selected parentarea and indicators, and calculate 
   #summary statistics (confidence intervals)
+  selected_index = substr(index, start=4, stop=nchar(index))
   sub_data <- data %>%
-    group_by(MPAName, TimePoint``) %>% # group by indicator as well
-    summarize(mean_measure_norm = mean(measure_norm),
-              sd_measure_norm = sd(measure_norm),
-              n = n(),
-              se = sd_measure_norm / sqrt(n)) %>%
-    ungroup()# %>%
+    select(MPAName, TimePoint, !!sym(selected_index)) %>%
+    group_by(MPAName, TimePoint) %>% # group by MPA, TimePoint
+    summarize(AvgIndex = mean(!!sym(selected_index)))#,
+            #  sd_measure_norm = sd(measure_norm),
+             # n = n(),
+              #se = sd_measure_norm / sqrt(n)) %>%
+  #  ungroup()# %>%
   #mutate(lower_ci = mean_measure_norm - 1.96 * se,
   #upper_ci = mean_measure_norm + 1.96 * se)
   #print(sub_data)
-  all_comb <- expand.grid(
-    year = unique(sub_data$year),
-    parent_area = unique(sub_data$parent_area),
-    indicator = unique(sub_data$indicator)
-  )
-  all_comb <- tibble(all_comb %>%
-                       mutate(mean_measure_norm = 0,
-                              sd_measure_norm = 0,
-                              n = 0,
-                              se = 0))
-  merged_data <- full_join(sub_data, all_comb)
-  merged_data <- merged_data %>%
-    group_by(year, parent_area, indicator) %>%
-    summarize(mean_measure_norm = max(mean_measure_norm, na.rm = T),
-              sd_measure_norm = max(sd_measure_norm, na.rm = T),
-              n = max(n, na.rm = T),
-              se = max(se, na.rm = T)) %>%
-    ungroup() %>%
-    mutate(lower_ci = mean_measure_norm - 1.96 * se,
-           upper_ci = mean_measure_norm + 1.96 * se)
+  #all_comb <- expand.grid(
+  #  year = unique(sub_data$year),
+  #  parent_area = unique(sub_data$parent_area),
+  #  indicator = unique(sub_data$indicator)
+  #)
+  #all_comb <- tibble(all_comb %>%
+  #                     mutate(mean_measure_norm = 0,
+  #                            sd_measure_norm = 0,
+  #                            n = 0,
+  #                            se = 0))
+  #merged_data <- full_join(sub_data, all_comb)
+  #merged_data <- merged_data %>%
+  #  group_by(year, parent_area, indicator) %>%
+  #  summarize(mean_measure_norm = max(mean_measure_norm, na.rm = T),
+  #            sd_measure_norm = max(sd_measure_norm, na.rm = T),
+  #            n = max(n, na.rm = T),
+  #            se = max(se, na.rm = T)) %>%
+  #  ungroup() %>%
+  #  mutate(lower_ci = mean_measure_norm - 1.96 * se,
+  #         upper_ci = mean_measure_norm + 1.96 * se)
   
   #print(merged_data)
   
   
   # Create bar plot with error bars and facet_wrap by parent_area
-  p <- ggplot(merged_data, aes(x = year, y = mean_measure_norm, fill = indicator)) +
+  p <- ggplot(sub_data, aes(x = MPAName, y = AvgIndex, fill = TimePoint)) +
     geom_bar(stat = "identity", position = "dodge") +
     #geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
     scale_fill_manual(values = c("#a2dab3", "#52b3c6", "#337dbb", "#253596")) +
     labs(title = "Measures between 2015 and 2021",
-         x = "Year",
-         y = "Measure",
+         x = "MPA",
+         y = index,
          fill = "Indicator") +
-    theme_bw() +
-    facet_wrap(~ parent_area, scales = "free_y", ncol = 1)
+    theme_bw()# +
+    #facet_wrap(~ parent_area, scales = "free_y", ncol = 1)
   
   return(p)  # Return plot
   
@@ -124,23 +127,22 @@ plot_epicurve <- function(data, MPA = NULL, index = NULL) {
 
 server <- function(input, output, session) {
   
-  # Define reactive data that filters optdata4 based on user input
+  # Define reactive data that filters settlement_data based on user input
   sub_data2 <- reactive({
     
-    if (!is.null(input$select_parentarea) && !is.null(input$select_indicators)){
-      sub_data3 <- optdata4 %>%
-        filter(parent_area %in% input$select_parentarea) %>%
-        filter(indicator %in% input$select_indicators)
+    if (!is.null(input$select_MPA) && !is.null(input$select_index)){
+      choose_MPA <- settlement_data %>%
+        filter(MPAName %in% input$select_MPA)
     } 
   })
   
   # Render the epicurve plot using the filtered data
   output$measures_histogram <- renderPlot(
-    plot_epicurve(sub_data2(), input$select_parentarea, input$select_indicators))
+    plot_epicurve(sub_data2(), input$select_MPA, input$select_index))
   
   # Render a table showing the filtered data
   output$table_data <- renderTable({
-    if (is.null(input$select_parentarea) && is.null(input$select_indicators)) {
+    if (is.null(input$select_MPA) && is.null(input$select_index)) {
       return(NULL)
     } else {
       sub_data2()
