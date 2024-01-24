@@ -72,7 +72,7 @@ plot_epicurve <- function(data, MPA = NULL, index = NULL) {
   sub_data <- data %>%
     select(MPAName, TimePoint, !!sym(selected_index)) %>%
     group_by(MPAName, TimePoint) %>% # group by MPA, TimePoint
-    summarize(AvgIndex = mean(!!sym(selected_index)))#,
+    summarize(AvgIndex = mean(!!sym(selected_index), na.rm=T), ct=n())#,
             #  sd_measure_norm = sd(measure_norm),
              # n = n(),
               #se = sd_measure_norm / sqrt(n)) %>%
@@ -102,6 +102,7 @@ plot_epicurve <- function(data, MPA = NULL, index = NULL) {
   #         upper_ci = mean_measure_norm + 1.96 * se)
   
   #print(merged_data)
+  print(sub_data)
   
   
   # Create bar plot with error bars and facet_wrap by parent_area
@@ -132,8 +133,14 @@ server <- function(input, output, session) {
     
     if (!is.null(input$select_MPA) && !is.null(input$select_index)){
       choose_MPA <- settlement_data %>%
-        filter(MPAName %in% input$select_MPA)
-    } 
+        filter(MPAName %in% input$select_MPA) %>%
+        select(-c("MPAID")) %>%
+        mutate(Treatment=if_else(Treatment==1, "MPA", "Non-MPA"))
+      return(choose_MPA)
+    } else {
+      return(NULL)
+    }
+    
   })
   
   # Render the epicurve plot using the filtered data
@@ -144,8 +151,23 @@ server <- function(input, output, session) {
   output$table_data <- renderTable({
     if (is.null(input$select_MPA) && is.null(input$select_index)) {
       return(NULL)
-    } else {
-      sub_data2()
+    } else if (is.null(sub_data2())) {
+      return(NULL)
+    }else {
+      modified_data <- reactive(
+        {
+          modify <- sub_data2() %>%
+            mutate(
+              `Material Index` = MAIndex,
+              `Marine Tenure Index` = MTIndex,
+              `Food Security Index` = FSIndex,
+              `School Enrollment Rate` = SERate
+            ) %>%
+            select(-c("MAIndex", "MTIndex", "FSIndex", "SERate", "PAIndex"))
+          return(modify)
+        }
+      )
+      modified_data()
     }
   })
   
