@@ -32,20 +32,20 @@ ui <- fluidPage(
       ),
       
       # radio button inputs for index
-      #checkboxGroupInput(
-      #  inputId="select_index",
-      #  label="Select Index",
-      #  choices=c("Material Index", "Marine Tenure Index", "Food Security Index", "Place Attachment Index", "School Enrollment Rate"),
-      #  selected=NULL,
-      #  inline=FALSE
-      #),
-      radioButtons(
-        inputId = "select_index",
+      checkboxGroupInput(
+        inputId="select_index",
         label="Select Index",
         choices=c("Material Index", "Marine Tenure Index", "Food Security Index", "Place Attachment Index", "School Enrollment Rate"),
-        selected="Material Index",
+        selected=NULL,
         inline=FALSE
       ),
+      #radioButtons(
+      #  inputId = "select_index",
+      #  label="Select Index",
+      #  choices=c("Material Index", "Marine Tenure Index", "Food Security Index", "Place Attachment Index", "School Enrollment Rate"),
+      #  selected="Material Index",
+      #  inline=FALSE
+      #),
       
       checkboxGroupInput(
         choices=unique(settlement_data$TimePoint),
@@ -84,63 +84,71 @@ plot_epicurve <- function(data, MPA=NULL, index=NULL, time=NULL) {
   ## Filter data based on selected parentarea and indicators, and calculate 
   ## summary statistics (confidence intervals)
   # selected_index = substr(index, start=4, stop=nchar(index))
-  # print(index)
-  sub_data <- data %>%
-    select(MPAName, TimePoint, !!sym(index)) %>%
-    group_by(MPAName, TimePoint) %>% # group by MPA, TimePoint
-    summarize(AvgIndex = mean(!!sym(index), na.rm=T)) %>%#,
-            #  sd_measure_norm = sd(measure_norm),
-             # n = n(),
-              #se = sd_measure_norm / sqrt(n)) %>%
-    ungroup() %>%
-    filter(TimePoint %in% time)
-  #mutate(lower_ci = mean_measure_norm - 1.96 * se,
-  #upper_ci = mean_measure_norm + 1.96 * se)
-  #print(sub_data)
-  #all_comb <- expand.grid(
-  #  year = unique(sub_data$year),
-  #  parent_area = unique(sub_data$parent_area),
-  #  indicator = unique(sub_data$indicator)
-  #)
-  #all_comb <- tibble(all_comb %>%
-  #                     mutate(mean_measure_norm = 0,
-  #                            sd_measure_norm = 0,
-  #                            n = 0,
-  #                            se = 0))
-  #merged_data <- full_join(sub_data, all_comb)
-  #merged_data <- merged_data %>%
-  #  group_by(year, parent_area, indicator) %>%
-  #  summarize(mean_measure_norm = max(mean_measure_norm, na.rm = T),
-  #            sd_measure_norm = max(sd_measure_norm, na.rm = T),
-  #            n = max(n, na.rm = T),
-  #            se = max(se, na.rm = T)) %>%
+  #sub_data <- data %>%
+  #  select(MPAName, TimePoint, !!sym(index)) %>%
+  #  group_by(MPAName, TimePoint) %>% # group by MPA, TimePoint
+  #  summarize(AvgIndex = mean(!!sym(index), na.rm=T)) %>%
   #  ungroup() %>%
-  #  mutate(lower_ci = mean_measure_norm - 1.96 * se,
-  #         upper_ci = mean_measure_norm + 1.96 * se)
-  
-  # print(merged_data)
-  # print(sub_data)
-  
-  
-  # Create bar plot with error bars and facet_wrap by parent_area
-  p <- ggplot(sub_data, aes(x = MPAName, y = AvgIndex, fill = TimePoint)) +
-    geom_bar(stat = "identity", position = position_dodge(width=0.8), width=0.8) +
-    #geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci), width = 0.2, position = position_dodge(0.5)) +
-    scale_fill_manual(values = c(
-      "Baseline"="#a2dab3",
-      "2 Year Post"="#52b3c6",
-      "4 Year Post"="#337dbb",
-      "7 Year Post"="#253596"
-    )) +
-    labs(
-      title = paste("Change of", index, "in BHS MPA"),
-      x = '',
-      y = index,
-      fill = "Time Point"
-    ) +
-    theme_bw() + 
-    theme(axis.text.x=element_text(angle=30, vjust=0.8, hjust=0.8))# +
-    #facet_wrap(~ parent_area, scales = "free_y", ncol = 1)
+  #  filter(TimePoint %in% time)
+  ## long table
+  long_table <- data %>%
+    pivot_longer(
+      cols=c(`Material Index`,
+             `Marine Tenure Index`,
+             `Food Security Index`,
+             `Place Attachment Index`,
+             `School Enrollment Rate`),
+      
+      names_to="IndexName",
+      values_to="IndexValue"
+    ) %>%
+    filter(IndexName %in% index) %>%
+    filter(TimePoint %in% time) %>%
+    filter(MPAName %in% MPA) %>%
+    select(MPAName, TimePoint, IndexName, IndexValue)
+  #print(table(long_table$IndexName))
+  #print(long_table, n=500)
+  if (length(index)==1){
+    one_data <- long_table %>%
+      group_by(MPAName, TimePoint) %>%
+      summarize(AvgIndex = mean(IndexValue, na.rm=T))
+  #print(one_data, n=500)
+    p <- ggplot(one_data, aes(x=MPAName, y=AvgIndex, fill=TimePoint)) +
+      geom_bar(stat="identity", position=position_dodge(width=0.8), width=0.8) +
+      scale_fill_manual(values=c(
+        "Baseline"="#a2dab3",
+        "2 Year Post"="#52b3c6",
+        "4 Year Post"="#337dbb",
+        "7 Year Post"="#253596"
+      )) + 
+      labs(
+        title=paste("Change of", long_table$IndexName[1], "in BHS MPA"),
+        x='',
+        y=long_table$IndexName[1],
+        fill="Time Point"
+      ) + 
+      theme_bw() + 
+      theme(axis.text.x=element_text(angle=30, vjust=0.8, hjust=0.8))
+  } else {
+    one_data<-long_table %>%
+      group_by(MPAName, TimePoint, IndexName) %>%
+      summarize(AvgIndex = mean(IndexValue, na.rm=T))
+    p <- ggplot(one_data, aes(x=MPAName, y=AvgIndex, fill=TimePoint)) +
+      geom_bar(stat="identity", position=position_dodge(width=0.8), width=0.8) +
+      scale_fill_manual(values=c(
+        "Baseline"="#a2dab3",
+        "2 Year Post"="#52b3c6",
+        "4 Year Post"="#337dbb",
+        "7 Year Post"="#253596"
+      )) + 
+      labs(
+        x='',
+        fill="Time Point"
+      ) + 
+      theme_bw() + 
+      theme(axis.text.x=element_text(angle=30, vjust=0.8, hjust=0.8)) + 
+      facet_wrap(~ IndexName, scales="free_y", ncol = 1)
+  }
   
   return(p)  # Return plot
   
@@ -155,7 +163,6 @@ server <- function(input, output, session) {
   
   # Define reactive data that filters settlement_data based on user input
   filtered_data <- reactive({
-    
     if (!is.null(input$select_MPA) && !is.null(input$select_index) && !is.null(input$select_Time)){
       choose_MPA <- settlement_data %>%
         mutate(
@@ -168,14 +175,19 @@ server <- function(input, output, session) {
           SettlementID = as.integer(round(SettlementID)),
           TimePoint = factor(TimePoint, levels=c("Baseline", "2 Year Post", "4 Year Post", "7 Year Post"))
         ) %>%
-        filter(MPAName %in% input$select_MPA) %>%
-        select(SettlementID, SettlementName, MPAName, Treatment, TimePoint, input$select_index)
+        select(SettlementID, SettlementName, MPAName, Treatment, TimePoint,
+               `Material Index`,
+               `Marine Tenure Index`,
+               `Food Security Index`,
+               `Place Attachment Index`,
+               `School Enrollment Rate`
+               )
       return(choose_MPA)
     } else {
       return(NULL)
     }
-    
   })
+  
   
   # Render the epicurve plot using the filtered data
   output$measures_histogram <- renderPlot(
@@ -190,7 +202,19 @@ server <- function(input, output, session) {
     }else {
       modified_data <- reactive(
         {
-          modify <- filtered_data()
+          modify <- settlement_data %>%
+            mutate(
+              `Material Index` = MAIndex,
+              `Marine Tenure Index` = MTIndex,
+              `Food Security Index` = FSIndex,
+              `Place Attachment Index` = PAIndex,
+              `School Enrollment Rate` = SERate,
+              Treatment = if_else(Treatment == 1, "MPA", "Non-MPA"),
+              SettlementID = as.integer(round(SettlementID)),
+              TimePoint = factor(TimePoint, levels=c("Baseline", "2 Year Post", "4 Year Post", "7 Year Post"))
+            ) %>%
+            select(SettlementID, SettlementName, MPAName, Treatment, TimePoint, all_of(input$select_index)
+            )
           return(modify)
         }
       )
